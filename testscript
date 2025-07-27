@@ -1,475 +1,376 @@
--- Создаём ScreenGui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DraggableMenu"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = game:GetService("CoreGui")
+-- Old Version: https://raw.githubusercontent.com/Acrillis/SynapseX/master/Synapse%20Scripts/StreamSniper.lua
+local Screenguini = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local TextLabel_2 = Instance.new("TextLabel")
+local UsernameBox = Instance.new("TextBox")
+local TextLabel_3 = Instance.new("TextLabel")
+local PlaceIdBox = Instance.new("TextBox")
+local StartButton = Instance.new("TextButton")
+local TextLabel_4 = Instance.new("TextLabel")
+local UsernameLabel = Instance.new("TextLabel")
+local TextLabel_5 = Instance.new("TextLabel")
+local UserIdLabel = Instance.new("TextLabel")
+local GamerPicture = Instance.new("ImageLabel")
 
--- Главное окно меню
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 350, 0, 400)
-MainFrame.Position = UDim2.new(0.5, -175, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
-MainFrame.Active = true
-
--- Заголовок (для перетаскивания)
-local Title = Instance.new("TextLabel")
-Title.Name = "Title"
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Title.BorderSizePixel = 0
-Title.Text = "Моё Меню"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Parent = MainFrame
-
--- Контейнер для вкладок (слева)
-local TabContainer = Instance.new("Frame")
-TabContainer.Name = "TabContainer"
-TabContainer.Size = UDim2.new(0, 100, 1, -30)
-TabContainer.Position = UDim2.new(0, 0, 0, 30)
-TabContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-TabContainer.BorderSizePixel = 0
-TabContainer.Parent = MainFrame
-
--- Контейнер для содержимого вкладки
-local ContentContainer = Instance.new("Frame")
-ContentContainer.Name = "ContentContainer"
-ContentContainer.Size = UDim2.new(1, -100, 1, -30)
-ContentContainer.Position = UDim2.new(0, 100, 0, 30)
-ContentContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-ContentContainer.BorderSizePixel = 0
-ContentContainer.Parent = MainFrame
-
--- Хранение вкладок и кнопок
-local Tabs = {}
-local SelectedTab = nil
-
--- Пользовательские сервисы
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local camera = workspace.CurrentCamera
+local TeleportService = game:GetService("TeleportService")
 
--- Создаём вкладку
-local function CreateTab(name)
-    local tabButton = Instance.new("TextButton")
-    tabButton.Size = UDim2.new(1, 0, 0, 40)
-    tabButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-    tabButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-    tabButton.Text = name
-    tabButton.Parent = TabContainer
+Screenguini.Name = HttpService:GenerateGUID(false)
+Screenguini.Parent = game:GetService("CoreGui")
 
-    local tabContent = Instance.new("ScrollingFrame")
-    tabContent.Size = UDim2.new(1, 0, 1, 0)
-    tabContent.BackgroundTransparency = 1
-    tabContent.BorderSizePixel = 0
-    tabContent.CanvasSize = UDim2.new(0, 0, 0, 0)
-    tabContent.ScrollBarThickness = 4
-    tabContent.Visible = false
-    tabContent.Parent = ContentContainer
+Frame.Parent = Screenguini
+Frame.Active = true
+Frame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+Frame.BorderColor3 = Color3.fromRGB(31, 31, 31)
+Frame.Draggable = true
+Frame.Size = UDim2.new(0, 400, 0, 260)
 
-    Tabs[name] = {
-        Button = tabButton,
-        Content = tabContent,
-        Buttons = {}
-    }
+TextLabel.Parent = Frame
+TextLabel.Active = true
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+TextLabel.BorderColor3 = Color3.fromRGB(31, 31, 40)
+TextLabel.Size = UDim2.new(0, 400, 0, 40)
+TextLabel.Font = Enum.Font.SourceSansLight
+TextLabel.Text = "Synapse X Stream Sniper"
+TextLabel.TextSize = 24.000
 
-    tabButton.MouseButton1Click:Connect(function()
-        -- Скрыть все вкладки
-        for _, tab in pairs(Tabs) do
-            tab.Content.Visible = false
-            tab.Button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        end
-        -- Показать выбранную
-        tabContent.Visible = true
-        tabButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-        SelectedTab = Tabs[name]
-    end)
+TextLabel_2.Parent = Frame
+TextLabel_2.Active = true
+TextLabel_2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_2.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_2.Position = UDim2.new(0, 10, 0, 49)
+TextLabel_2.Size = UDim2.new(0, 150, 0, 20)
+TextLabel_2.Font = Enum.Font.SourceSansLight
+TextLabel_2.Text = "Username/UserId:"
+TextLabel_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.TextSize = 16.000
 
-    -- Если первая вкладка — сразу открыть
-    if not SelectedTab then
-        tabButton:CaptureFocus()
-        tabButton.MouseButton1Click:Wait()
-    end
+UsernameBox.Name = "UsernameBox"
+UsernameBox.Parent = Frame
+UsernameBox.BackgroundColor3 = Color3.fromRGB(61, 61, 61)
+UsernameBox.BorderColor3 = Color3.fromRGB(31, 31, 31)
+UsernameBox.Position = UDim2.new(0, 10, 0, 80)
+UsernameBox.Size = UDim2.new(0, 150, 0, 35)
+UsernameBox.Font = Enum.Font.SourceSansLight
+UsernameBox.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+UsernameBox.PlaceholderText = "Enter Username Here"
+UsernameBox.Text = ""
+UsernameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameBox.TextSize = 18.000
 
-    -- Функция добавления кнопки
-    function Tabs[name]:AddButton(buttonName, callback)
-        local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(1, -20, 0, 35)
-        btn.Position = UDim2.new(0, 10, 0, #self.Buttons * 40 + 10)
-        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        btn.Text = buttonName
-        btn.Parent = self.Content
-        btn.MouseButton1Click:Connect(callback)
+TextLabel_3.Parent = Frame
+TextLabel_3.Active = true
+TextLabel_3.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_3.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_3.Position = UDim2.new(0, 10, 0, 130)
+TextLabel_3.Size = UDim2.new(0, 150, 0, 20)
+TextLabel_3.Font = Enum.Font.SourceSansLight
+TextLabel_3.Text = "Place Id:"
+TextLabel_3.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_3.TextSize = 16.000
 
-        table.insert(self.Buttons, btn)
-        -- Обновляем CanvasSize
-        self.Content.CanvasSize = UDim2.new(0, 0, 0, #self.Buttons * 40 + 20)
-    end
+PlaceIdBox.Name = "PlaceIdBox"
+PlaceIdBox.Parent = Frame
+PlaceIdBox.BackgroundColor3 = Color3.fromRGB(61, 61, 61)
+PlaceIdBox.BorderColor3 = Color3.fromRGB(31, 31, 31)
+PlaceIdBox.Position = UDim2.new(0, 10, 0, 157)
+PlaceIdBox.Size = UDim2.new(0, 150, 0, 35)
+PlaceIdBox.Font = Enum.Font.SourceSansLight
+PlaceIdBox.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+PlaceIdBox.PlaceholderText = "Enter PlaceId Here"
+PlaceIdBox.Text = ""
+PlaceIdBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlaceIdBox.TextSize = 18.000
 
-    -- Функция добавления тумблера (toggle)
-    function Tabs[name]:AddToggle(name, default, callback)
-        local toggleFrame = Instance.new("Frame")
-        toggleFrame.Size = UDim2.new(1, -20, 0, 35)
-        toggleFrame.Position = UDim2.new(0, 10, 0, #self.Buttons * 40 + 10)
-        toggleFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        toggleFrame.Parent = self.Content
+StartButton.Name = "StartButton"
+StartButton.Parent = Frame
+StartButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+StartButton.BorderColor3 = Color3.fromRGB(31, 31, 31)
+StartButton.Position = UDim2.new(0, 10, 0, 210)
+StartButton.Size = UDim2.new(0, 380, 0, 40)
+StartButton.Font = Enum.Font.SourceSansLight
+StartButton.Text = "Start"
+StartButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+StartButton.TextSize = 24.000
 
-        local toggleLabel = Instance.new("TextLabel")
-        toggleLabel.Text = name
-        toggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
-        toggleLabel.BackgroundTransparency = 1
-        toggleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        toggleLabel.Parent = toggleFrame
+TextLabel_4.Parent = Frame
+TextLabel_4.Active = true
+TextLabel_4.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_4.BackgroundTransparency = 1.000
+TextLabel_4.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_4.Position = UDim2.new(0, 200, 0, 49)
+TextLabel_4.Size = UDim2.new(0, 0, 0, 20)
+TextLabel_4.AutomaticSize = Enum.AutomaticSize.X
+TextLabel_4.Font = Enum.Font.SourceSansBold
+TextLabel_4.Text = "Username:"
+TextLabel_4.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_4.TextSize = 16.000
+TextLabel_4.TextWrapped = true
+TextLabel_4.TextXAlignment = Enum.TextXAlignment.Left
 
-        local toggleButton = Instance.new("TextButton")
-        toggleButton.Size = UDim2.new(0.3, -10, 1, -10)
-        toggleButton.Position = UDim2.new(0.7, 5, 0, 5)
-        toggleButton.BackgroundColor3 = default and Color3.fromRGB(100, 200, 100) or Color3.fromRGB(150, 50, 50)
-        toggleButton.Text = default and "Вкл" or "Выкл"
-        toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        toggleButton.Parent = toggleFrame
+UsernameLabel.Name = "UsernameLabel"
+UsernameLabel.Parent = TextLabel_4
+UsernameLabel.Active = true
+UsernameLabel.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+UsernameLabel.BackgroundTransparency = 1.000
+UsernameLabel.BorderColor3 = Color3.fromRGB(31, 31, 31)
+UsernameLabel.Position = UDim2.new(0.5, 0, 0, 0)
+UsernameLabel.Size = UDim2.new(0, 150, 0, 20)
+UsernameLabel.Font = Enum.Font.SourceSansLight
+UsernameLabel.Text = ""
+UsernameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UsernameLabel.TextSize = 16.000
+UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-        local toggled = default
+TextLabel_5.Parent = Frame
+TextLabel_5.Active = true
+TextLabel_5.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_5.BackgroundTransparency = 1.000
+TextLabel_5.BorderColor3 = Color3.fromRGB(31, 31, 31)
+TextLabel_5.Position = UDim2.new(0, 200, 0, 69)
+TextLabel_5.Size = UDim2.new(0, 0, 0, 20)
+TextLabel_5.AutomaticSize = Enum.AutomaticSize.X
+TextLabel_5.Font = Enum.Font.SourceSansBold
+TextLabel_5.Text = "UserId:"
+TextLabel_5.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_5.TextSize = 16.000
+TextLabel_5.TextWrapped = true
+TextLabel_5.TextXAlignment = Enum.TextXAlignment.Left
 
-        toggleButton.MouseButton1Click:Connect(function()
-            toggled = not toggled
-            toggleButton.BackgroundColor3 = toggled and Color3.fromRGB(100, 200, 100) or Color3.fromRGB(150, 50, 50)
-            toggleButton.Text = toggled and "Вкл" or "Выкл"
-            callback(toggled)
-        end)
+UserIdLabel.Name = "UserIdLabel"
+UserIdLabel.Parent = TextLabel_5
+UserIdLabel.Active = true
+UserIdLabel.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+UserIdLabel.BackgroundTransparency = 1.000
+UserIdLabel.BorderColor3 = Color3.fromRGB(31, 31, 31)
+UserIdLabel.Position = UDim2.new(0.5, 0, 0, 0)
+UserIdLabel.Size = UDim2.new(0, 150, 0, 20)
+UserIdLabel.Font = Enum.Font.SourceSansLight
+UserIdLabel.Text = ""
+UserIdLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+UserIdLabel.TextSize = 16.000
+UserIdLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-        table.insert(self.Buttons, toggleFrame)
-        self.Content.CanvasSize = UDim2.new(0, 0, 0, #self.Buttons * 40 + 20)
-    end
+GamerPicture.Name = "GamerPicture"
+GamerPicture.Parent = Frame
+GamerPicture.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+GamerPicture.Position = UDim2.new(0, 200, 0, 95)
+GamerPicture.Size = UDim2.new(0, 97, 0, 97)
+GamerPicture.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png"
 
-    -- Функция добавления слайдера
-    function Tabs[name]:AddSlider(params)
-        local sliderFrame = Instance.new("Frame")
-        sliderFrame.Size = UDim2.new(1, -20, 0, 50)
-        sliderFrame.Position = UDim2.new(0, 10, 0, #self.Buttons * 40 + 10)
-        sliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-        sliderFrame.Parent = self.Content
+if shared.STREAM_SNIPER then
+   shared.STREAM_SNIPER:Destroy()
+end
+shared.STREAM_SNIPER = Screenguini
 
-        local label = Instance.new("TextLabel")
-        label.Text = params.Name
-        label.Size = UDim2.new(1, 0, 0, 20)
-        label.BackgroundTransparency = 1
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Parent = sliderFrame
+local searching = false
+local confirm = false
 
-        local sliderBar = Instance.new("Frame")
-        sliderBar.Size = UDim2.new(1, -20, 0, 15)
-        sliderBar.Position = UDim2.new(0, 10, 0, 25)
-        sliderBar.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        sliderBar.Parent = sliderFrame
-
-        local sliderFill = Instance.new("Frame")
-        sliderFill.Size = UDim2.new((params.Default - params.Min) / (params.Max - params.Min), 0, 1, 0)
-        sliderFill.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
-        sliderFill.Parent = sliderBar
-
-        local valueLabel = Instance.new("TextLabel")
-        valueLabel.Size = UDim2.new(0, 50, 0, 20)
-        valueLabel.Position = UDim2.new(1, 5, 0, 0)
-        valueLabel.BackgroundTransparency = 1
-        valueLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        valueLabel.Text = params.Default .. " " .. (params.Suffix or "")
-        valueLabel.Parent = sliderFrame
-
-        local dragging = false
-
-        sliderBar.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or
-               input.UserInputType == Enum.UserInputType.Touch then
-                dragging = true
-            end
-        end)
-
-        sliderBar.InputEnded:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 or
-               input.UserInputType == Enum.UserInputType.Touch then
-                dragging = false
-            end
-        end)
-
-        sliderBar.InputChanged:Connect(function(input)
-            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement or
-               input.UserInputType == Enum.UserInputType.Touch then
-                local pos = math.clamp(input.Position.X - sliderBar.AbsolutePosition.X, 0, sliderBar.AbsoluteSize.X)
-                local value = params.Min + (pos / sliderBar.AbsoluteSize.X) * (params.Max - params.Min)
-                value = math.floor(value / params.Increment + 0.5) * params.Increment
-                sliderFill.Size = UDim2.new((value - params.Min) / (params.Max - params.Min), 0, 1, 0)
-                valueLabel.Text = tostring(value) .. " " .. (params.Suffix or "")
-                params.Callback(value)
-            end
-        end)
-
-        table.insert(self.Buttons, sliderFrame)
-        self.Content.CanvasSize = UDim2.new(0, 0, 0, #self.Buttons * 40 + 40)
-    end
-
-    return Tabs[name]
+local function HttpGet(url)
+return pcall(HttpService.JSONDecode, HttpService, game:HttpGet(url))
 end
 
--- Перетаскивание меню (мышь и тач)
-do
-    local dragging = false
-    local dragInput
-    local dragStart
-    local startPos
+local function Status(text, tout)
+StartButton.Text = text
 
-    local function update(input)
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-
-    Title.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or
-           input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true
-            dragStart = input.Position
-            startPos = MainFrame.Position
-
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    Title.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement or
-           input.UserInputType == Enum.UserInputType.Touch then
-            dragInput = input
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if input == dragInput and dragging then
-            update(input)
-        end
-    end)
+   if tout then
+       task.delay(tout, function()
+           if StartButton.Text == text then
+               searching = false
+               StartButton.Text = "Start"    
+           end
+       end)
+   end
 end
 
--- Создаём вкладку LocalPlayer и добавляем функции
-local localTab = CreateTab("LocalPlayer")
+local function getServers(id, cursor)
+   local fullurl = "https://games.roblox.com/v1/games/".. id .."/servers/Public?limit=100"
+   if cursor then
+       fullurl = "&cursor=".. cursor
+   end
 
--- WalkSpeed input
-local walkSpeedValue = 16
-localTab:AddButton("Установить WalkSpeed = 16", function()
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChildOfClass("Humanoid") then
-        char.Humanoid.WalkSpeed = 16
-        walkSpeedValue = 16
-    end
-end)
-localTab:AddButton("Установить WalkSpeed = 50", function()
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChildOfClass("Humanoid") then
-        char.Humanoid.WalkSpeed = 50
-        walkSpeedValue = 50
-    end
-end)
-localTab:AddButton("Установить WalkSpeed = 100", function()
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChildOfClass("Humanoid") then
-        char.Humanoid.WalkSpeed = 100
-        walkSpeedValue = 100
-    end
-end)
-
--- Fly режим
-local flying = false
-local flyConnection
-localTab:AddToggle("Fly", false, function(state)
-    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local hrp = char:WaitForChild("HumanoidRootPart")
-
-    if state then
-        flying = true
-        local bv = Instance.new("BodyVelocity")
-        bv.Name = "FlyVelocity"
-        bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-        bv.Velocity = Vector3.new(0, 0, 0)
-        bv.Parent = hrp
-
-        flyConnection = RunService.RenderStepped:Connect(function()
-            if flying then
-                local moveDir = Vector3.new()
-                if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + camera.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - camera.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - camera.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + camera.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDir = moveDir + Vector3.new(0, 1, 0) end
-                if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDir = moveDir - Vector3.new(0, 1, 0) end
-
-                if moveDir.Magnitude > 0 then
-                    bv.Velocity = moveDir.Unit * 50
-                else
-                    bv.Velocity = Vector3.new(0, 0, 0)
-                end
-            end
-        end)
-    else
-        flying = false
-        if flyConnection then
-            flyConnection:Disconnect()
-            flyConnection = nil
-        end
-        local flyPart = hrp:FindFirstChild("FlyVelocity")
-        if flyPart then flyPart:Destroy() end
-    end
-end)
-
--- SpinBot (вращение персонажа)
-local spinning = false
-local spinConnection
-localTab:AddToggle("SpinBot", false, function(state)
-    spinning = state
-    local char = LocalPlayer.Character
-    if spinning and char then
-        local hrp = char:FindFirstChild("HumanoidRootPart")
-        spinConnection = RunService.RenderStepped:Connect(function()
-            if spinning and hrp then
-                hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(15), 0)
-            end
-        end)
-    else
-        if spinConnection then
-            spinConnection:Disconnect()
-            spinConnection = nil
-        end
-    end
-end)
-
--- Third Person (камера)
-localTab:AddToggle("Third Person (Zoom Out)", false, function(state)
-    if state then
-        LocalPlayer.CameraMaxZoomDistance = 20
-    else
-        LocalPlayer.CameraMaxZoomDistance = 2.5
-    end
-end)
-
--- ESP игроков
-local espEnabled = false
-local highlights = {}
-
-localTab:AddToggle("ESP игроков", false, function(state)
-    espEnabled = state
-
-    for _, highlight in pairs(highlights) do
-        if highlight and highlight.Parent then
-            highlight:Destroy()
-        end
-    end
-    table.clear(highlights)
-
-    if espEnabled then
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                local highlight = Instance.new("Highlight")
-                highlight.Name = "PlayerESP"
-                highlight.Adornee = player.Character
-                highlight.FillColor = Color3.fromRGB(255, 50, 50)
-                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                highlight.FillTransparency = 0.5
-                highlight.OutlineTransparency = 0
-                highlight.Parent = player.Character
-                highlights[player] = highlight
-            end
-        end
-
-        Players.PlayerAdded:Connect(function(newPlayer)
-            newPlayer.CharacterAdded:Connect(function(char)
-                if not espEnabled then return end
-                task.wait(1)
-                local highlight = Instance.new("Highlight")
-                highlight.Name = "PlayerESP"
-                highlight.Adornee = char
-                highlight.FillColor = Color3.fromRGB(255, 50, 50)
-                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                highlight.FillTransparency = 0.5
-                highlight.OutlineTransparency = 0
-                highlight.Parent = char
-                highlights[newPlayer] = highlight
-            end)
-        end)
-    end
-end)
-
--- Aimbot
-local aiming = false
-local aimRadius = 300
-
-localTab:AddToggle("Aimbot (видимые игроки)", false, function(state)
-    aiming = state
-end)
-
-localTab:AddSlider({
-    Name = "Радиус прицела",
-    Min = 50,
-    Max = 600,
-    Default = aimRadius,
-    Increment = 10,
-    Suffix = "px",
-    Callback = function(value)
-        aimRadius = value
-    end
-})
-
-local function isVisible(targetPart)
-    local origin = camera.CFrame.Position
-    local direction = (targetPart.Position - origin).Unit * 1000
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-    raycastParams.FilterDescendantsInstances = {LocalPlayer.Character, camera}
-
-    local ray = workspace:Raycast(origin, direction, raycastParams)
-    return ray and ray.Instance and ray.Instance:IsDescendantOf(targetPart.Parent)
+   return HttpGet(fullurl)
 end
 
-local function getClosestVisiblePlayer()
-    local closestPlayer, shortestDistance = nil, math.huge
+local function fetchThumbs(tokens)
+   local payload = {
+       Url = "https://thumbnails.roblox.com/v1/batch",
+       Headers = {
+           ["Content-Type"] = "application/json"
+       },
+       Method = "POST",
 
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            local head = player.Character.Head
-            if isVisible(head) then
-                local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
-                if onScreen then
-                    local mouse = UserInputService:GetMouseLocation()
-                    local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(mouse.X, mouse.Y)).Magnitude
-                    if dist < shortestDistance and dist < aimRadius then
-                        shortestDistance = dist
-                        closestPlayer = head
-                    end
-                end
-            end
-        end
-    end
+       Body = {}
+   }
 
-    return closestPlayer
+   for _, token in ipairs(tokens) do
+       table.insert(payload.Body, {
+           requestId = "0:".. token ..":AvatarHeadshot:150x150:png:regular",
+           type = "AvatarHeadShot",
+           targetId = 0,
+           token = token,
+           format = "png",
+           size = "150x150"
+       })
+   end
+
+   payload.Body = HttpService:JSONEncode(payload.Body)
+   local result = syn.request(payload)
+   local s, data = pcall(HttpService.JSONDecode, HttpService, result.Body)
+   return s, data and data.data or data
 end
 
-RunService.RenderStepped:Connect(function()
-    if aiming then
-        local target = getClosestVisiblePlayer()
-        if target then
-            camera.CFrame = CFrame.new(camera.CFrame.Position, target.Position)
-        end
-    end
+local function teleport(placeId, guid)
+   TeleportService:TeleportToPlaceInstance(placeId, guid)
+end
+
+
+local threads = 30
+
+StartButton.MouseButton1Click:Connect(function()
+   if confirm then
+       confirm = false
+       searching = false
+       Status("Cancelled")
+       return
+   end
+
+   if searching then
+       confirm = true
+       local old = StartButton.Text
+       Status("Click again to confirm.")
+       task.delay(5, function()
+           if "Click again to confirm." == StartButton.Text then
+               confirm = false
+               StartButton.Text = old
+           end
+       end)
+       return
+   end
+
+   searching = true
+
+   -- User ID
+   Status("Getting user id...")
+
+   local s, Username, UserId = pcall(function() -- TODO FIX: fix for only numbers players
+       local userId = tonumber(UsernameBox.Text) or Players:GetUserIdFromNameAsync(UsernameBox.Text)
+       local username = Players:GetNameFromUserIdAsync(userId)
+
+return username, userId
+end)
+
+if not s then
+return Status("Username or UserId does not exist!", 3)
+end
+
+   local s, thumbUrl = pcall(Players.GetUserThumbnailAsync, Players, UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
+
+   UsernameLabel.Text = Username
+   UserIdLabel.Text = UserId
+   GamerPicture.Image = s and thumbUrl or ""
+
+   Status("Getting user's thumbnail...")
+   local s, response = HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. UserId .. "&format=Png&size=150x150&isCircular=false")
+   --local s, response = HttpGet("https://www.roblox.com/headshot-thumbnail/json?userId=" .. UserId .. "&width=150&height=150")
+   local thumbnail = s and response['data'][1].imageUrl
+
+   Status("Searching for (".. UserId ..")")
+   
+   -- Place ID
+   Status("Getting place id...")
+   
+   local placeId = tonumber(PlaceIdBox.Text)
+
+   if PlaceIdBox.Text:gsub("%s", "") == "" then
+       placeId = game.PlaceId
+
+   elseif not placeId then
+       Status("Invalid place id", 3)
+       return
+   end
+   
+   Status("Searching...")
+   local cursor = nil
+   local searched = 0
+   local maxSearchs = 0
+   local players = 0
+   -- Server search
+   while searching do
+       if not Screenguini or not Screenguini.Parent then
+           break
+       end
+       local s, result = getServers(placeId, cursor)
+
+       if s then
+           local servers = result.data
+           cursor = result.nextPageCursor
+           
+           if StartButton.Text:match("Searching") then
+               maxSearchs = maxSearchs + #servers
+               Status(searched .."/".. maxSearchs .." servers scanned, players found: ".. players)
+           end
+
+           -- Search all servers
+           for index, server in ipairs(servers) do
+               local function fetchServer()
+                   local s, thumbs = fetchThumbs(server.playerTokens)
+                   if s then
+                       players = players + #thumbs
+                       for _, playerThumb in ipairs(thumbs) do
+                           if playerThumb.imageUrl then
+                               if playerThumb.imageUrl == thumbnail then
+                                   searching = false
+                                   Status("Found player, teleporting...")
+
+                                   teleport(placeId, server.id)
+                                   local try = 0
+                                   Player.OnTeleport:Connect(function(teleportState)
+                                       if teleportState == Enum.TeleportState.Failed then
+                                           try = try + 1
+                                           Status("Teleport failed, try #".. try)
+                                           teleport(placeId, server.id)
+                                       end
+                                   end)
+                               end
+                           else
+                               Status("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+                               --print("token failed, id:", playerThumb.requestId, playerThumb.state, playerThumb.errorMessage)
+                           end
+                       end
+                   else
+                       Status("token failed", s, thumb)
+                       --print("token failed", s, thumbs)
+                   end
+               end
+               searched = searched + 1
+               if index % threads ~= 0 then
+                   task.spawn(fetchServer)
+                   task.wait()
+
+               else
+                   fetchServer()
+               end
+
+               if searching then
+                   Status(searched .."/".. maxSearchs .." servers scanned, players found: ".. players)
+               end
+           end
+           
+           -- Player not found
+           if not cursor then
+               break
+           end
+       else
+           return Status("Failed to find servers", 3)
+       end
+
+       task.wait()
+   end
+   
+   if searching then
+       Status("Failed to find ".. Username ..", maybe in a vip server", 3)
+   end
 end)
